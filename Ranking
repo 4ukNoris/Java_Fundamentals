@@ -1,1 +1,89 @@
+package MapsLambdaAndStreamAPI_Exercises.MoreExercises;
+
+import java.util.*;
+
+public class Ranking {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        LinkedHashMap<String, String> contestPasswordMap = new LinkedHashMap<>();
+
+        String input = scanner.nextLine();
+        while (!"end of contests".equals(input)) {
+            String contest = input.split(":")[0];
+            String password = input.split(":")[1];
+
+            if (!contestPasswordMap.containsKey(contest)) {
+                contestPasswordMap.put(contest, password);
+            }
+
+            input = scanner.nextLine();
+        }
+
+        TreeMap<String, LinkedHashMap<String, Integer>> namesContPointsMap = new TreeMap<>();
+
+
+        String command = scanner.nextLine();
+        while (!"end of submissions".equals(command)) {
+            String contest = command.split("=>")[0];
+            String password = command.split("=>")[1];
+            String nameOfStudent = command.split("=>")[2];
+            int points = Integer.parseInt(command.split("=>")[3]);
+
+            // Проверка дали курса и паролата са валидни
+            if (contestPasswordMap.containsKey(contest) && contestPasswordMap.containsValue(password)) {
+                // Проверка дали студента и курса ги има в списъка
+                if (!namesContPointsMap.containsKey(nameOfStudent) && !namesContPointsMap.containsKey(contest)) {
+                    namesContPointsMap.put(nameOfStudent, new LinkedHashMap<>(points));
+                    namesContPointsMap.get(nameOfStudent).put(contest, points);
+                    // Проверка дали на името на студента има съществуващ курс и ако няма го добавяме
+                } else if (namesContPointsMap.containsKey(nameOfStudent) && !namesContPointsMap.get(nameOfStudent).containsKey(contest)) {
+                    namesContPointsMap.get(nameOfStudent).put(contest, points);
+                    // Ако и името и курса съществуват проверяваме дали новите точки са по високи от предишните
+                } else {
+                    int currPoints = namesContPointsMap.get(nameOfStudent).get(contest);
+                    // Ако точките са по високи ги презаписваме
+                    namesContPointsMap.get(nameOfStudent).put(contest, Math.max(points, currPoints));
+
+                }
+            }
+
+            command = scanner.nextLine();
+        }
+
+        String bestStudentName = "";
+        int maxSumOfPoints = -1;
+
+        // Итерирам мапа за да взема кой студент има най - висок общ резултат
+        for (Map.Entry<String, LinkedHashMap<String, Integer>> entry : namesContPointsMap.entrySet()) {
+            String studentName = entry.getKey();
+            int sumPoints = 0;
+
+            // Итерирам вложения мап за да взема и съмирам всички точки
+            for (Map.Entry<String, Integer> listEntry : entry.getValue().entrySet()) {
+
+                sumPoints += listEntry.getValue();
+
+            }
+            if (sumPoints > maxSumOfPoints) {
+                maxSumOfPoints = sumPoints;
+                bestStudentName = studentName;
+            }
+        }
+        System.out.printf("Best candidate is %s with total %d points.\n", bestStudentName, maxSumOfPoints);
+        System.out.println("Ranking:");
+
+        // Обхождам върху главния мап за да взема името на студента
+        for (Map.Entry<String, LinkedHashMap<String, Integer>> entry : namesContPointsMap.entrySet()) {
+            String name = entry.getKey();
+            System.out.printf("%s\n", name);
+
+            // Итерирам вложения мап като сортирам точките от най - големите към най - малките
+            entry.getValue().entrySet().stream().sorted((first, second) -> second.getValue() - first.getValue())
+                    .forEach(i -> System.out.printf("#  %s -> %d\n", i.getKey(), i.getValue()));
+
+        }
+
+    }
+}
 
