@@ -32,16 +32,20 @@ public class Ranking {
 
             // Проверка дали курса и паролата са валидни
             if (contestPasswordMap.containsKey(contest) && contestPasswordMap.containsValue(password)) {
+
                 // Проверка дали студента и курса ги има в списъка
                 if (!namesContPointsMap.containsKey(nameOfStudent) && !namesContPointsMap.containsKey(contest)) {
                     namesContPointsMap.put(nameOfStudent, new LinkedHashMap<>(points));
                     namesContPointsMap.get(nameOfStudent).put(contest, points);
+
                     // Проверка дали на името на студента има съществуващ курс и ако няма го добавяме
                 } else if (namesContPointsMap.containsKey(nameOfStudent) && !namesContPointsMap.get(nameOfStudent).containsKey(contest)) {
                     namesContPointsMap.get(nameOfStudent).put(contest, points);
+
                     // Ако и името и курса съществуват проверяваме дали новите точки са по високи от предишните
                 } else {
                     int currPoints = namesContPointsMap.get(nameOfStudent).get(contest);
+
                     // Ако точките са по високи ги презаписваме
                     namesContPointsMap.get(nameOfStudent).put(contest, Math.max(points, currPoints));
 
