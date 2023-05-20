@@ -1,1 +1,119 @@
+package MapsLambdaAndStreamAPI_Exercises.MoreExercises;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+
+public class Judge_2 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Списък с състезанията и броя на явилите се студенти
+        TreeMap<String, Integer> contestsCountMap = new TreeMap<>();
+        // Списък с всички състезания, суденти и точките им
+        LinkedHashMap<String, LinkedHashMap<String, Integer>> userNamesPointsMap = new LinkedHashMap<>();
+
+
+        String input = scanner.nextLine();
+        while (!"no more time".equals(input)) {
+            String userName = input.split(" -> ")[0];
+            String contest = input.split(" -> ")[1];
+            int points = Integer.parseInt(input.split(" -> ")[2]);
+
+            // Събираме информация за бройката хора които са се явили за даденото състезание
+            if (!contestsCountMap.containsKey(contest)) {
+                contestsCountMap.put(contest, 1);
+                // Проверка дали някой не се е явил повече от веднъж
+            } else if (userNamesPointsMap.containsKey(contest) && !userNamesPointsMap.get(contest).containsKey(userName)) {
+                contestsCountMap.put(contest, contestsCountMap.get(contest) + 1);
+            }
+
+            // Проверка дали състезанието и името вече са записани в userName списъка, ако не ги добавяме
+            if (!userNamesPointsMap.containsKey(contest) && !userNamesPointsMap.containsKey(userName)) {
+                userNamesPointsMap.put(contest, new LinkedHashMap<>());
+                userNamesPointsMap.get(contest).put(userName, points);
+
+                // Проверка дали името на студента го има във вече съществуващото състезание
+            } else if (userNamesPointsMap.containsKey(contest) && !userNamesPointsMap.get(contest).containsKey(userName)) {
+                userNamesPointsMap.get(contest).put(userName, points);
+            } else {
+                // Ако в мапа има и състезанието и името на студента, презаписваме новите точки само ако са повисоки от текущите
+                int currPoints = userNamesPointsMap.get(contest).get(userName);
+                userNamesPointsMap.get(contest).put(userName, Math.max(points, currPoints));
+
+            }
+
+
+            input = scanner.nextLine();
+        }
+        // Списък с общия брой точки за всеки студент по отделно
+        LinkedHashMap<String, Integer> individualStandingsMap = new LinkedHashMap<>();
+
+        // Итерирам през целия списък от състезания, студенти и точките им
+        for (Map.Entry<String, LinkedHashMap<String, Integer>> entry : userNamesPointsMap.entrySet()) {
+            // Изкарвам в променлива вложения мап за четимост
+            LinkedHashMap<String, Integer> namesMap = entry.getValue();
+
+            // Итерирам по вложения мап за да взема всички точки за всеки студент по отделно от всички състезания
+            for (Map.Entry<String, Integer> namesEntry : namesMap.entrySet()) {
+
+                // Проверка дали вече е записан в мапа, ако не е го добавям към него с точките му
+                if (!individualStandingsMap.containsKey(namesEntry.getKey())) {
+                    individualStandingsMap.put(namesEntry.getKey(), namesEntry.getValue());
+                } else {
+                    // В противен случай добавям към резултат точките от другите състезания в които е участвал
+                    int currPoints = individualStandingsMap.get(namesEntry.getKey());
+                    individualStandingsMap.put(namesEntry.getKey(), namesEntry.getValue() + currPoints);
+                }
+            }
+
+        }
+        // Правя брояч от тип AtomicInteger, защото при ламбда не ми го приема като примитива
+        AtomicInteger count = new AtomicInteger();
+
+        // Итерираме през целия мап със състезания и студенти
+        userNamesPointsMap.entrySet().stream().forEach(element -> {
+            count.set(1);// Задавам начална стойност на брояча
+
+            // Принтираме името на състезанието и броя на студентите във всяко състезание
+            System.out.printf("%s: %d participants\n", element.getKey(), contestsCountMap.get(element.getKey()));
+
+            // Итерираме през вложения мап със студенти и техните точки като ги сортираме в намаляващ ред спрямо точките
+            element.getValue().entrySet().stream().sorted((second, first) -> {
+                int sort = Integer.compare(first.getValue(), second.getValue());
+
+                // Проверка дали стойностите са им равни, ако да ги връщаме в реда в който сме ги прочели
+                if (sort == 0) {
+                    sort = second.getKey().compareTo(first.getKey());
+                }
+                return sort;
+            }).forEach(name -> {
+
+                System.out.printf("%d. %s <::> %d\n", count.getAndIncrement(), name.getKey(), name.getValue());
+            });
+        });
+
+        System.out.println("Individual standings:");
+
+        count.set(1);
+        // Итерирам по статистическия мап със студенти и техните точки като ги сортираме в намаляващ ред спрямо точките
+        individualStandingsMap.entrySet().stream().sorted((second, first) -> {
+            int sort = Integer.compare(first.getValue(), second.getValue());
+
+            // Проверка дали стойностите са им равни, ако да ги връщаме в реда в който сме ги прочели
+            if (sort == 0) {
+                sort = second.getKey().compareTo(first.getKey());
+            }
+            return sort;
+        }).forEach(student -> {
+
+            System.out.printf("%d. %s -> %d\n", count.getAndIncrement(), student.getKey(), student.getValue());
+        });
+
+    }
+}
+
 
