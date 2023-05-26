@@ -1,1 +1,106 @@
+package TextProcessing_Exercises.MoreExercises;
+
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class MorseCodeTranslator_4 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        String[] morseCodeArr = scanner.nextLine().split("\\|");
+
+        for (int i = 0; i < morseCodeArr.length; i++) {
+            String currCode = morseCodeArr[i];
+            String[] currCodeArr = currCode.split(" ");
+
+            for (int j = 0; j < currCodeArr.length; j++) {
+                String letter = currCodeArr[j];
+
+                switch (letter) {
+                    case ".-":
+                        currCodeArr[j] = "A";
+                        break;
+                    case "-...":
+                        currCodeArr[j] = "B";
+                        break;
+                    case "-.-.":
+                        currCodeArr[j] = "C";
+                        break;
+                    case "-..":
+                        currCodeArr[j] = "D";
+                        break;
+                    case ".":
+                        currCodeArr[j] = "E";
+                        break;
+                    case "..-.":
+                        currCodeArr[j] = "F";
+                        break;
+                    case "--.":
+                        currCodeArr[j] = "G";
+                        break;
+                    case "....":
+                        currCodeArr[j] = "H";
+                        break;
+                    case "..":
+                        currCodeArr[j] = "I";
+                        break;
+                    case ".---":
+                        currCodeArr[j] = "J";
+                        break;
+                    case "-.-":
+                        currCodeArr[j] = "K";
+                        break;
+                    case ".-..":
+                        currCodeArr[j] = "L";
+                        break;
+                    case "--":
+                        currCodeArr[j] = "M";
+                        break;
+                    case "-.":
+                        currCodeArr[j] = "N";
+                        break;
+                    case "---":
+                        currCodeArr[j] = "O";
+                        break;
+                    case ".--.":
+                        currCodeArr[j] = "P";
+                        break;
+                    case "--.-":
+                        currCodeArr[j] = "Q";
+                        break;
+                    case ".-.":
+                        currCodeArr[j] = "R";
+                        break;
+                    case "...":
+                        currCodeArr[j] = "S";
+                        break;
+                    case "-":
+                        currCodeArr[j] = "T";
+                        break;
+                    case "..-":
+                        currCodeArr[j] = "U";
+                        break;
+                    case "...-":
+                        currCodeArr[j] = "V";
+                        break;
+                    case ".--":
+                        currCodeArr[j] = "W";
+                        break;
+                    case "-..-":
+                        currCodeArr[j] = "X";
+                        break;
+                    case "-.--":
+                        currCodeArr[j] = "Y";
+                        break;
+                    case "--..":
+                        currCodeArr[j] = "Z";
+                        break;
+                }
+            }
+            morseCodeArr[i] = Arrays.toString(currCodeArr);
+        }
+        System.out.println(String.join(" ", morseCodeArr).replace("[", "")
+                .replace("]", "").replace(", ", ""));
+    }
+}
 
