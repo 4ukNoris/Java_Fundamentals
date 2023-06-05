@@ -1,1 +1,211 @@
+package Methods_Exercises.More_Exercises;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class ArrayManipulator_6 {
+    public static int getMaxIndex(List<Integer> numbersList, String evenOrOdd) {
+        int maxNumb = Integer.MIN_VALUE;
+        int maxIndex = -1;
+
+        if ("odd".equals(evenOrOdd)) { // Проверка дали командата е "нечетно"
+            for (int i = 0; i < numbersList.size(); i++) {
+                int numb = numbersList.get(i);
+
+                // Ако числото е нечетно и е по голямо или равно на най - голямото
+                if (numb % 2 != 0 && numb >= maxNumb) {
+                    maxNumb = numb;
+                    maxIndex = i; // Взимам индекса на който се намира най - голямото число
+                }
+            }
+        } else if ("even".equals(evenOrOdd)) { // Проверка дали командата е "четно"
+            for (int i = 0; i < numbersList.size(); i++) {
+                int numb = numbersList.get(i);
+
+                // Ако числото е нечетно и е по голямо или равно на най - голямото
+                if (numb % 2 == 0 && numb >= maxNumb) {
+                    maxNumb = numb;
+                    maxIndex = i; // Взимам индекса на който се намира най - голямото число
+                }
+            }
+        }
+        return maxIndex;
+    }
+
+    public static int getMinIndex(List<Integer> numbersList, String evenOrOdd) {
+        int minNumb = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        if ("odd".equals(evenOrOdd)) {
+            for (int i = 0; i < numbersList.size(); i++) {
+                int numb = numbersList.get(i);
+
+                if (numb % 2 != 0 && numb <= minNumb) {
+                    minNumb = numb;
+                    minIndex = i;
+                }
+            }
+        } else if ("even".equals(evenOrOdd)) {
+            for (int i = 0; i < numbersList.size(); i++) {
+                int numb = numbersList.get(i);
+
+                if (numb % 2 == 0 && numb <= minNumb) {
+                    minNumb = numb;
+                    minIndex = i;
+                }
+            }
+        }
+        return minIndex;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        List<Integer> numbersList = Arrays.stream(scanner.nextLine().split(" "))
+                .map(Integer::parseInt).collect(Collectors.toList());
+
+        String input = scanner.nextLine();
+        while (!"end".equals(input)) {
+            String command = input.split(" ")[0]; // Командата ми равна на първия елемент от входните данни
+            switch (command) {
+                case "exchange":
+                    // Взимам индекса от втория елемент на входните данни и го парствам към число
+                    int index = Integer.parseInt(input.split(" ")[1]);
+
+                    // Правя проверка дали индекса ми е валиден
+                    if (index >= 0 && index < numbersList.size()) {
+                        modifyNumbersList(numbersList, index);
+                    } else {
+                        System.out.println("Invalid index");
+                    }
+                    break;
+                case "max":
+                    String evenOrOdd = input.split(" ")[1];
+                    int maxIndex = getMaxIndex(numbersList, evenOrOdd);
+
+                    // Ако maxIndex ми е равен -1 значи не съм намерил максимално четно или нечетно число
+                    if (maxIndex == -1) {
+                        System.out.println("No matches");
+                    } else {
+                        System.out.println(maxIndex);
+                    }
+                    break;
+                case "min":
+                    evenOrOdd = input.split(" ")[1];
+                    int minIndex = getMinIndex(numbersList, evenOrOdd);
+
+                    // Ако minIndex ми е равен -1 значи не съм намерил максимално четно или нечетно число
+                    if (minIndex == -1) {
+                        System.out.println("No matches");
+                    } else {
+                        System.out.println(minIndex);
+                    }
+                    break;
+                case "first":
+                    int count = Integer.parseInt(input.split(" ")[1]);
+                    evenOrOdd = input.split(" ")[2];
+                    // Проверка дали бройя елементи които търсим е в границите на списъка
+                    if (count > numbersList.size() || count == 0) {
+                        System.out.println("Invalid count");
+                    } else {
+                        printFirstMeet(numbersList, count, evenOrOdd);
+                    }
+                    break;
+                case "last":
+                    count = Integer.parseInt(input.split(" ")[1]);
+                    evenOrOdd = input.split(" ")[2];
+
+                    // Проверка дали бройя елементи които търсим е в границите на списъка
+                    if (count > numbersList.size() || count == 0) {
+                        System.out.println("Invalid count");
+                    } else {
+                        printLastMeet(numbersList, count, evenOrOdd);
+                    }
+                    break;
+            }
+
+            input = scanner.nextLine();
+        }
+        System.out.println(numbersList.toString().replace("{", "[").replace("}", "]"));
+    }
+
+    private static void modifyNumbersList(List<Integer> numbersList, int index) {
+
+        for (int i = numbersList.size() - 1; i > index; i--) {
+            int currElement = numbersList.get(numbersList.size() - 1);
+            numbersList.remove(numbersList.size() - 1);
+            numbersList.add(0, currElement);
+
+        }
+    }
+
+    private static void printFirstMeet(List<Integer> numbersList, int count, String evenOrOdd) {
+        int counter = 0;
+        // Правя си нов списък в който ще поставям елементите отговарящи на условията
+        List<Integer> evenOrOddNumList = new ArrayList<>();
+        if ("even".equals(evenOrOdd)) {
+            for (int number : numbersList) {
+                // Ако е четно числото го слагам в списъка
+                if (number % 2 == 0) {
+                    evenOrOddNumList.add(number);
+                    counter++;
+                }
+                // Ако съм достигнал необходимата бройка прекъсвам търсенето
+                if (counter == count) {
+                    break;
+                }
+            }
+        } else if ("odd".equals(evenOrOdd)) {
+            for (int number : numbersList) {
+                // Ако е нечетно числото го слагам в списъка
+                if (number % 2 != 0) {
+                    evenOrOddNumList.add(number);
+                    counter++;
+                }
+                if (counter == count) {
+                    break;
+                }
+            }
+        }
+        // Принтирам списъка с елементи като го преобразувам на String и заменям скобите на List със скоби на Array
+        System.out.println(evenOrOddNumList.toString().replace("{", "[").replace("}", "]"));
+    }
+
+    private static void printLastMeet(List<Integer> numbersList, int count, String evenOrOdd) {
+        int counter = 0;
+        // Правя си нов списък в който ще поставям елементите отговарящи на условията
+        List<Integer> evenOrOddNumList = new ArrayList<>();
+        if ("even".equals(evenOrOdd)) {
+        // Понеже въртя цикъла на обратно елемнтите които записвам в листа са от зад на пред
+            for (int i = numbersList.size() - 1; i >= 0; i--) {
+                int number = numbersList.get(i);
+                // Ако е четно числото го слагам в списъка
+                if (number % 2 == 0) {
+                    evenOrOddNumList.add(number);
+                    counter++;
+                }
+                // Ако съм достигнал необходимата бройка прекъсвам търсенето
+                if (counter == count) {
+                    break;
+                }
+            }
+        } else if ("odd".equals(evenOrOdd)) {
+            for (int i = numbersList.size() - 1; i >= 0; i--) {
+                int number = numbersList.get(i);
+                // Ако е нечетно числото го слагам в списъка
+                if (number % 2 != 0) {
+                    evenOrOddNumList.add(number);
+                    counter++;
+                }
+                if (counter == count) {
+                    break;
+                }
+            }
+        }
+        // Обръщам елементите в списъка
+        Collections.reverse(evenOrOddNumList);
+
+        // Принтирам списъка с елементи като го преобразувам на String и заменям скобите на List със скоби на Array
+        System.out.println(evenOrOddNumList.toString().replace("{", "[").replace("}", "]"));
+    }
+}
