@@ -1,1 +1,109 @@
 
+import java.util.LinkedHashMap;
+import java.util.Scanner;
+
+public class NeedForSpeedIII_3 {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        LinkedHashMap<String, LinkedHashMap<Integer, Integer>> carsInfoMap = new LinkedHashMap<>();
+        int numbOfCars = Integer.parseInt(scanner.nextLine());
+        for (int i = 0; i < numbOfCars; i++) {
+            String[] carsArr = scanner.nextLine().split("\\|");
+            String model = carsArr[0];
+            int kilometers = Integer.parseInt(carsArr[1]);
+            int fuel = Integer.parseInt(carsArr[2]);
+            carsInfoMap.put(model, new LinkedHashMap<>());
+            carsInfoMap.get(model).put(kilometers, fuel);
+        }
+        int maxLitters = 75;
+        int minMileage = 10000;
+        int maxMileage = 100000;
+
+        String input = scanner.nextLine();
+        while (!"Stop".equals(input)) {
+            String command = input.split(" : ")[0];
+            String model = input.split(" : ")[1];
+
+            // Правя си мап в който слагам данните от вложения мап за да мога да достъпя елментите му
+            LinkedHashMap<Integer, Integer> distanceFuelMap = carsInfoMap.get(model);
+
+            switch (command) {
+                case "Drive":
+                    int distance = Integer.parseInt(input.split(" : ")[2]);
+                    int fuel = Integer.parseInt(input.split(" : ")[3]);
+
+// Моментните километри ги запазвам като взимам от горния мап ключа обръщам го в String и след това го парствам към int
+                    int currDistance = Integer.parseInt(
+                            distanceFuelMap.keySet().toString().replaceAll("[\\[\\]]", ""));
+                    int currFuel = distanceFuelMap.get(currDistance);
+
+                    int newDistance = currDistance + distance;
+                    int newFuel = currFuel - fuel;
+
+                    if (currFuel >= fuel) {
+                        // Премахвам вельото на модела, защото newDistance се води ключ на вложения мап и ако е различен
+                        //от текущия не го презаписва с новите данни, а го записва като нов
+                        carsInfoMap.get(model).remove(currDistance);
+
+                        // Добавям новите данни към дадения модел
+                        carsInfoMap.get(model).put(newDistance, newFuel);
+
+                        System.out.printf("%s driven for %d kilometers. %d liters of fuel consumed.\n", model, distance, fuel);
+                    } else {
+                        System.out.println("Not enough fuel to make that ride");
+                    }
+                    if (newDistance >= maxMileage) {
+                        System.out.printf("Time to sell the %s!\n", model);
+                        carsInfoMap.remove(model);
+                    }
+
+                    break;
+                case "Refuel":
+                    fuel = Integer.parseInt(input.split(" : ")[2]);
+
+                    currDistance = Integer.parseInt(
+                            distanceFuelMap.keySet().toString().replaceAll("[\\[\\]]", ""));
+                    currFuel = distanceFuelMap.get(currDistance);
+// Ако моментното гориво с това което трябва да се зареди и в същото време текущото е по - малко или равно на максимума
+                    if (currFuel + fuel <= maxLitters && currFuel < maxLitters) {
+                        // Увеличавам текущото гориво с това което ми е подадено
+                        currFuel += fuel;
+                    } else {
+                        // В другите случаи горивото което трябва да заредя е като от максималното извадя текущото
+                        fuel = maxLitters - currFuel;
+                        // Пълня резервоара до горе :)
+                        currFuel = maxLitters;
+                    }
+            // Добавям като нови данни за горивото текущото, защото съм променил информацията която е записана в него
+                    carsInfoMap.get(model).put(currDistance, currFuel);
+                    System.out.printf("%s refueled with %d liters\n", model, fuel);
+                    break;
+                case "Revert":
+                    distance = Integer.parseInt(input.split(" : ")[2]);
+
+                    currDistance = Integer.parseInt(
+                            distanceFuelMap.keySet().toString().replaceAll("[\\[\\]]", ""));
+                    currFuel = distanceFuelMap.get(currDistance);
+
+                    // Премахвам текущата информация за да запиша на нейно място новата информация по - надолу
+                    carsInfoMap.get(model).remove(currDistance);
+
+                    if (currDistance > distance && currDistance - distance >= minMileage) {
+                        carsInfoMap.get(model).put((currDistance - distance), currFuel);
+                        System.out.printf("%s mileage decreased by %d kilometers\n", model, distance);
+                    } else {
+                        carsInfoMap.get(model).put(minMileage, currFuel);
+                    }
+                    break;
+            }
+            input = scanner.nextLine();
+        }
+        carsInfoMap.forEach((model, infoMap) -> {
+            infoMap.forEach((km, fuel) -> {
+                System.out.printf("%s -> Mileage: %d kms, Fuel in the tank: %d lt.\n", model, km, fuel);
+            });
+        });
+    }
+}
+
